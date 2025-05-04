@@ -4,10 +4,10 @@ import {resolve, basename} from 'node:path';
 import {pipeline} from 'node:stream/promises';
 
 
-const handleFsCommands = async (command) => {
+const handleFsCommands = async (command, rl) => {
   switch (true) {
     case command.startsWith('cat '):
-      await logFile(command.slice(4))
+      await logFile(command.slice(4), rl)
       break
     
     case command.startsWith('add '):
@@ -36,15 +36,25 @@ const handleFsCommands = async (command) => {
   }
 }
 
-const logFile = async (pathToFile) => {
+const logFile = async (pathToFile, rl) => {
   try {
     const filePath = resolve(pathToFile.trim());
-    const stream = createReadStream(filePath, {encoding: 'utf8', autoClose: true});
-    await pipeline(stream, process.stdout)
+    const stream = createReadStream(filePath, {encoding: 'utf8'});
+    
+    stream.on('data', (chunk) => process.stdout.write(chunk));
+    stream.on('end', () => {
+      console.log('\nSuccessfully reading file');
+      rl.prompt()
+    });
+    stream.on('error', (err) => {
+      console.log(`Operation failed: ${err.message}`);
+      rl.prompt()
+    });
   } catch (err) {
-    console.error(err.message);
+    console.log(`Operation failed: ${err.message}`);
+    rl.prompt()
   }
-}
+};
 
 const createFile = async (fileName) => {
   try {
@@ -54,9 +64,9 @@ const createFile = async (fileName) => {
     
   } catch (err) {
     if (err.code === 'EEXIST') {
-      console.error('Operation failed: File already exists');
+      console.log('Operation failed: File already exists');
     } else {
-      console.error('Operation failed:', err.message);
+      console.log('Operation failed:', err.message);
     }
   }
 }
@@ -123,30 +133,30 @@ const moveFile = async (paths) => {
     const absSourcePath = resolve(sourcePath);
     const absDir = resolve(targetDir);
     const absTargetPath = resolve(targetDir, basename(sourcePath));
-
+    
     await access(absSourcePath);
     await access(absDir);
-
+    
     const readStream = createReadStream(absSourcePath);
     const writeStream = createWriteStream(absTargetPath);
-
+    
     await pipeline(readStream, writeStream);
     await unlink(absSourcePath);
-
+    
     console.log(`Success! ${absSourcePath} moved to: ${absTargetPath}`);
-
+    
   } catch (err) {
     console.error(`Operation failed: ${err.message}`);
   }
 }
 
 const deleteFile = async (filePath) => {
-  try{
+  try {
     const resolvedPath = resolve(filePath);
     await rm(resolvedPath, {force: false, recursive: false});
-    console.log(`Successfully deleted: "${path}"`);
+    console.log(`Successfully deleted: "${resolvedPath}"`);
     
-  }catch(err){
+  } catch (err) {
     console.error(`Operation failed: ${err.message}`);
   }
 }

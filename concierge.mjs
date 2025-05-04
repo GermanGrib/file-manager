@@ -1,15 +1,17 @@
 import readline from 'node:readline';
-import {stdin as input, stdout as output} from 'node:process'
+import {homedir} from 'node:os'
+import {chdir, exit, stdin as input, stdout as output} from 'node:process'
 import handleNavCommands from './handle-nav-commands.mjs';
 import handleFsCommands from './handle-fs-commands.mjs';
 import handleOsCommands from './handle-os-commands.mjs';
-import process from "node:process"
 import handleHashCommands from './handle-hash-commands.mjs';
 import handleZipCommands from './handle-zip-commands.mjs';
+import logDirChangedTo from './utils/log-dir-change-to.mjs';
 
 const concierge = (username) => {
   console.log(`Welcome to the File Manager, ${username}!`);
-  console.log(`You are currently in ${import.meta.dirname}`)
+  chdir(homedir())
+  logDirChangedTo()
   const rl = readline.createInterface({
     input,
     output,
@@ -24,7 +26,7 @@ const concierge = (username) => {
       switch (true) {
         case command === '.exit':
           conciergeFarewell(username, rl);
-          break;
+          return;
         
         case command === 'up':
         case command === 'ls':
@@ -42,15 +44,15 @@ const concierge = (username) => {
           await handleFsCommands(command, rl)
           break
         
-        case command === "os --EOL":
-        case command === "os --cpus":
-        case command === "os --homedir":
-        case command === "os --username":
-        case command === "os --architecture":
+        case command === 'os --EOL':
+        case command === 'os --cpus':
+        case command === 'os --homedir':
+        case command === 'os --username':
+        case command === 'os --architecture':
           await handleOsCommands(command)
           break
         
-        case command.startsWith("hash "):
+        case command.startsWith('hash '):
           await handleHashCommands(command)
           break
         
@@ -65,8 +67,10 @@ const concierge = (username) => {
       
     } catch (err) {
       console.log('Operation failed')
+    } finally {
+      logDirChangedTo()
+      rl.prompt();
     }
-    rl.prompt();
   })
   
   rl.on('SIGINT', () => {
@@ -78,7 +82,7 @@ const concierge = (username) => {
 const conciergeFarewell = (username, rl) => {
   console.log(`\nThank you for using File Manager, ${username}, goodbye!`);
   rl.close();
-  process.exit(0);
+  exit(0);
 }
 
 export default concierge;
