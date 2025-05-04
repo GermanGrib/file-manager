@@ -3,6 +3,7 @@ import {stdin as input, stdout as output} from 'node:process'
 import handleNavCommands from './handle-nav-commands.mjs';
 import handleFsCommands from './handle-fs-commands.mjs';
 import handleOsCommands from './handle-os-commands.mjs';
+import process from "node:process"
 
 const concierge = (username) => {
   console.log(`Welcome to the File Manager, ${username}!`);
@@ -42,6 +43,8 @@ const concierge = (username) => {
         case command === "os --EOL":
         case command === "os --cpus":
         case command === "os --homedir":
+        case command === "os --username":
+        case command === "os --architecture":
           await handleOsCommands(command)
           break
         
@@ -64,6 +67,7 @@ const concierge = (username) => {
 const conciergeFarewell = (username, rl) => {
   console.log(`\nThank you for using File Manager, ${username}, goodbye!`);
   rl.close();
+  process.exit(0);
 }
 
 export default concierge;

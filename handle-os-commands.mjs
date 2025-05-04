@@ -1,4 +1,4 @@
-import {EOL, cpus, homedir} from 'node:os';
+import {EOL, cpus, homedir, userInfo, arch} from 'node:os';
 
 const handleOsCommands = async (command) => {
   switch (true) {
@@ -21,6 +21,15 @@ const handleOsCommands = async (command) => {
     
     case command === "os --homedir":
       console.log(`Homedir: ${homedir()}`);
+      break
+    
+    case command === "os --username":
+      console.log(`Username: ${userInfo().username}`);
+      break
+    
+    case command === "os --architecture":
+      const architecture = arch();
+      console.log(`Node.js compiled for: ${architecture}`);
       break
   }
 }
