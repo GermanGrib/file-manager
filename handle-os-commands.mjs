@@ -1,4 +1,4 @@
-import {EOL, cpus} from 'node:os';
+import {EOL, cpus, homedir} from 'node:os';
 
 const handleOsCommands = async (command) => {
   switch (true) {
@@ -17,6 +17,10 @@ const handleOsCommands = async (command) => {
         console.log(`- Model: ${cpu.model}`);
         console.log(`- Clock Rate: ${(cpu.speed / 1000).toFixed(2)} GHz`);
       })
+      break
+    
+    case command === "os --homedir":
+      console.log(`Homedir: ${homedir()}`);
       break
   }
 }

@@ -41,6 +41,7 @@ const concierge = (username) => {
         
         case command === "os --EOL":
         case command === "os --cpus":
+        case command === "os --homedir":
           await handleOsCommands(command)
           break
         
