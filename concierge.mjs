@@ -4,6 +4,7 @@ import handleNavCommands from './handle-nav-commands.mjs';
 import handleFsCommands from './handle-fs-commands.mjs';
 import handleOsCommands from './handle-os-commands.mjs';
 import process from "node:process"
+import handleHashCommands from './handle-hash-commands.mjs';
 
 const concierge = (username) => {
   console.log(`Welcome to the File Manager, ${username}!`);
@@ -46,6 +47,10 @@ const concierge = (username) => {
         case command === "os --username":
         case command === "os --architecture":
           await handleOsCommands(command)
+          break
+        
+        case command.startsWith("hash "):
+          await handleHashCommands(command)
           break
         
         default:
