@@ -2,6 +2,7 @@ import readline from 'node:readline';
 import {stdin as input, stdout as output} from 'node:process'
 import handleNavCommands from './handle-nav-commands.mjs';
 import handleFsCommands from './handle-fs-commands.mjs';
+import handleOsCommands from './handle-os-commands.mjs';
 
 const concierge = (username) => {
   console.log(`Welcome to the File Manager, ${username}!`);
@@ -36,6 +37,11 @@ const concierge = (username) => {
         case command.startsWith('mv '):
         case command.startsWith('rm '):
           await handleFsCommands(command, rl)
+          break
+        
+        case command === "os --EOL":
+        case command === "os --cpus":
+          await handleOsCommands(command)
           break
         
         default:
