@@ -1,5 +1,5 @@
 import {createReadStream, createWriteStream} from 'node:fs';
-import {writeFile, mkdir, rename, access, unlink} from 'node:fs/promises'
+import {writeFile, mkdir, rename, access, unlink, rm} from 'node:fs/promises'
 import {resolve, basename} from 'node:path';
 import {pipeline} from 'node:stream/promises';
 
@@ -28,6 +28,10 @@ const handleFsCommands = async (command) => {
     
     case command.startsWith('mv '):
       await moveFile(command.slice(3))
+      break
+    
+    case command.startsWith('rm '):
+      await deleteFile(command.slice(3))
       break
   }
 }
@@ -132,6 +136,17 @@ const moveFile = async (paths) => {
     console.log(`Success! ${absSourcePath} moved to: ${absTargetPath}`);
 
   } catch (err) {
+    console.error(`Operation failed: ${err.message}`);
+  }
+}
+
+const deleteFile = async (filePath) => {
+  try{
+    const resolvedPath = resolve(filePath);
+    await rm(resolvedPath, {force: false, recursive: false});
+    console.log(`Successfully deleted: "${path}"`);
+    
+  }catch(err){
     console.error(`Operation failed: ${err.message}`);
   }
 }

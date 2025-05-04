@@ -34,6 +34,7 @@ const concierge = (username) => {
         case command.startsWith('rn '):
         case command.startsWith('cp '):
         case command.startsWith('mv '):
+        case command.startsWith('rm '):
           await handleFsCommands(command, rl)
           break
         
